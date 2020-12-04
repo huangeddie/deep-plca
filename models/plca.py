@@ -4,6 +4,9 @@ from torch.nn import functional as F
 
 
 class DeepPLCA(nn.Module):
+    """
+    Priors and impulse are deep CNN functions of the image, while the features are global parameters
+    """
     def __init__(self, channels, imsize, nkern, kern_size):
         super().__init__()
         self.nkern = nkern
@@ -74,6 +77,12 @@ class DeepPLCA(nn.Module):
 
 
 class ConvPLCA(nn.Module):
+    """
+    Let params be the core nkern x channels x kern_size x kern_size parameters that influences everything
+    The impulse convolutional kernels are generated from a learnable per-kernel affine transformation from params
+    The feature logits are generated from a learnable per-kernel linear transformation from params  (it’s linear and not affine because the feature logits are then immediately fed into the soft max activation which is shift invariant
+    The priors are global
+    """
     def __init__(self, channels, imsize, nkern, kern_size):
         super().__init__()
         self.nkern = nkern
