@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 
-from models import Encoder, Decoder
+from models.modules import Encoder, Decoder
 
 
 class DrawLayer(nn.Module):
