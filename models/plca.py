@@ -7,6 +7,7 @@ class DeepPLCA(nn.Module):
     """
     Priors and impulse are deep CNN functions of the image, while the features are global parameters
     """
+
     def __init__(self, channels, imsize, nkern, kern_size):
         super().__init__()
         self.nkern = nkern
@@ -83,6 +84,7 @@ class ConvPLCA(nn.Module):
     The feature logits are generated from a learnable per-kernel linear transformation from params  (it’s linear and not affine because the feature logits are then immediately fed into the soft max activation which is shift invariant
     The priors are global
     """
+
     def __init__(self, channels, imsize, nkern, kern_size):
         super().__init__()
         self.nkern = nkern
