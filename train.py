@@ -119,7 +119,7 @@ def loop_data(args, model, data_loader, opt=None):
     torch.set_grad_enabled(training), model.cuda()
 
     losses = []
-    pbar = tqdm(data_loader, 'train' if training else 'test', mininterval=1)
+    pbar = tqdm(data_loader, '\ttrain' if training else '\ttest', mininterval=1)
     model.train(training)
     for imgs, _ in pbar:
         # Setup
