@@ -24,8 +24,6 @@ def plot_metrics(metrics):
         ax.plot(np.linspace(0, nepochs, len(loss)), loss, label=subset)
     ax.legend()
 
-    plt.show()
-
 
 def plot_pcla_recon(args, sample_img, model):
     torch.set_grad_enabled(False)
@@ -74,7 +72,6 @@ def plot_pcla_recon(args, sample_img, model):
     ax[1, 1].imshow(img.permute(1, 2, 0))
 
     ax[1, 2].remove()
-    plt.show()
 
     f.savefig(os.path.join(args.outdir, 'recon.jpg'))
 
@@ -115,8 +112,6 @@ def plot_ae_recon(args, sample_img, model):
     img = make_grid(recon.cpu(), normalize=True)
     ax[1].imshow(img.permute(1, 2, 0))
 
-    plt.show()
-
 
 def plot_al_recon(args, sample_img, model):
     torch.set_grad_enabled(False)
@@ -147,8 +142,6 @@ def plot_al_recon(args, sample_img, model):
         recon_layer_logits += layer_logits[i]
         img = make_grid(torch.sigmoid(recon_layer_logits).cpu())
         ax[1, i + 1].imshow(img.permute(1, 2, 0))
-
-    plt.show()
 
 
 def plot_recon(args, imgs, model):
