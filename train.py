@@ -120,7 +120,7 @@ def loop_data(args, model, data_loader, opt=None):
 
     losses = []
     pbar = tqdm(data_loader, 'train' if training else 'test', mininterval=1,
-                leave=False, position=1)
+                leave=False, position=0)
     model.train(training)
     for imgs, _ in pbar:
         # Setup
@@ -162,10 +162,10 @@ def train(args, model, train_loader, test_loader):
     elif args.opt == 'sgd':
         opt = optim.SGD(model.parameters(), args.lr, momentum=0.9)
     else:
-        raise Exception(f'Unknown optimizer {args.opt}')
+        raise Exception(f'unknown optimizer {args.opt}')
 
     # Train
-    pbar = tqdm(range(args.epochs), position=0)
+    pbar = tqdm(range(args.epochs))
     for _ in pbar:
         try:
             # Train
