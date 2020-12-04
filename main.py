@@ -41,7 +41,7 @@ parser.add_argument('--beta3', type=float,
                     help='prior entropy weight')
 
 
-def main(args):
+def run(args):
     # Load data
     train_loader, test_loader, channels = data.load_data(args, shuffle=True,
                                                          droplast=True)
@@ -59,3 +59,7 @@ def main(args):
     plots.plot_metrics(metrics)
     imgs, _ = next(iter(train_loader))
     plots.plot_recon(args, imgs[:1], model)
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    run(args)
