@@ -145,11 +145,11 @@ def plot_al_recon(args, sample_img, model):
 
 
 def plot_recon(args, imgs, model):
-    if isinstance(model, models.ConvPLCA):
+    if isinstance(model, models.plca.ConvPLCA):
         plot_plca_recon(args, imgs, model)
-    elif isinstance(model, models.AutoEncoder):
+    elif isinstance(model, models.auto.AutoEncoder):
         plot_ae_recon(args, imgs, model)
-    elif isinstance(model, models.AutoLayer):
+    elif isinstance(model, models.auto.AutoLayer):
         plot_al_recon(args, imgs, model)
     else:
         raise Exception(f'unknown model {model}')
