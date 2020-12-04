@@ -27,6 +27,7 @@ parser.add_argument('--nkern', type=int, default=None,
                     help='number of kernels. only for plca')
 parser.add_argument('--kern-size', type=int, default=None,
                     help='kernel size. only for plca')
+parser.add_argument('--save', type=str, default='./out/model.pt', help='where to save the model')
 
 # Training
 parser.add_argument('--opt', type=str, help='optimizer')

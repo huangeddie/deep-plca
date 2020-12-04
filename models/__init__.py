@@ -21,8 +21,8 @@ def make_model(args, channels):
 
 
 def optionally_load_wts(args, model):
-    if os.path.exists('./model.pt') and args.load:
-        model.load_state_dict(torch.load('./model.pt'))
+    if os.path.exists(args.save) and args.load:
+        model.load_state_dict(torch.load(args.save))
         print('loaded weights', flush=True)
     else:
         print('starting with new weights', flush=True)

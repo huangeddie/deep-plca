@@ -152,7 +152,6 @@ def loop_data(args, model, data_loader, opt=None):
 
 def train(args, model, train_loader, test_loader):
     # Setup
-    losses = []
     metrics = Metrics()
 
     # Optimizer
@@ -172,7 +171,7 @@ def train(args, model, train_loader, test_loader):
             metrics.add_epoch_loss('train', loss)
 
             # Save
-            torch.save(model.state_dict(), './model.pt')
+            torch.save(model.state_dict(), args.save)
 
             # Test
             loss = loop_data(args, model, test_loader)
