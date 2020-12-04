@@ -8,7 +8,7 @@ import plots
 parser = argparse.ArgumentParser()
 
 # Output
-parser.add_argument('--outdir', type=str, help='directory to save all work')
+parser.add_argument('--outdir', type=str, default='./out', help='directory to save all work')
 
 # Data
 parser.add_argument('--data', type=str, help='dataset')
