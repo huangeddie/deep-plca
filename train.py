@@ -119,8 +119,7 @@ def loop_data(args, model, data_loader, opt=None):
     torch.set_grad_enabled(training), model.cuda()
 
     losses = []
-    pbar = tqdm(data_loader, 'train' if training else 'test', mininterval=1,
-                leave=False, position=0)
+    pbar = tqdm(data_loader, 'train' if training else 'test', mininterval=1)
     model.train(training)
     for imgs, _ in pbar:
         # Setup
@@ -165,8 +164,7 @@ def train(args, model, train_loader, test_loader):
         raise Exception(f'unknown optimizer {args.opt}')
 
     # Train
-    pbar = tqdm(range(args.epochs))
-    for _ in pbar:
+    for e in range(args.epochs):
         try:
             # Train
             loss = loop_data(args, model, train_loader, opt)
@@ -179,7 +177,7 @@ def train(args, model, train_loader, test_loader):
             loss = loop_data(args, model, test_loader)
             metrics.add_epoch_loss('test', loss)
 
-            pbar.set_postfix_str(metrics.status_str())
+            print(f'epoch {e} - {metrics.status_str()}', flush=True)
         except KeyboardInterrupt:
             print('keyboard interrupt caught. ending training early')
             break
