@@ -165,8 +165,8 @@ def train(args, model, train_loader, test_loader):
         raise Exception(f'Unknown optimizer {args.opt}')
 
     # Train
-    pbar = tqdm(range(args.epochs))
-    for i in pbar:
+    pbar = tqdm(range(args.epochs), position=0)
+    for _ in pbar:
         try:
             # Train
             loss = loop_data(args, model, train_loader, opt)
