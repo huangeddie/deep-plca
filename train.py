@@ -120,7 +120,7 @@ def loop_data(args, model, data_loader, opt=None):
 
     losses = []
     pbar = tqdm(data_loader, 'train' if training else 'test', mininterval=1,
-                leave=False)
+                leave=False, position=1)
     model.train(training)
     for imgs, _ in pbar:
         # Setup
