@@ -34,11 +34,9 @@ parser.add_argument('--epochs', type=int)
 # Losses
 parser.add_argument('--recon', choices=['ce', 'bce', 'mse', 'kl'],
                     help='reconstruction loss. [cross entropy, binary cross entropy, mean squared error]')
-parser.add_argument('--beta1', type=float, help='impulse entropy weight')
-parser.add_argument('--beta2', type=float,
-                    help='feature (kernel) entropy weight')
-parser.add_argument('--beta3', type=float,
-                    help='prior entropy weight')
+parser.add_argument('--beta1', type=float, help='prior entropy')
+parser.add_argument('--beta2', type=float, help='impulse entropy')
+parser.add_argument('--beta3', type=float, help='feature entropy')
 
 
 def run(args):
