@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -74,6 +76,8 @@ def plot_pcla_recon(args, sample_img, model):
     ax[1, 2].remove()
     plt.show()
 
+    f.savefig(os.path.join(args.out, 'recon.jpg'))
+
     # Plot top components
     f, ax = plt.subplots(1, 6)
     f.set_size_inches(24, 4)
@@ -86,6 +90,8 @@ def plot_pcla_recon(args, sample_img, model):
         component.clamp_(min=0)
         img = make_grid(component.cpu(), normalize=True)
         ax[i].imshow(img.permute(1, 2, 0))
+
+    f.savefig(os.path.join(args.out, 'comp.jpg'))
 
 
 def plot_ae_recon(args, sample_img, model):
