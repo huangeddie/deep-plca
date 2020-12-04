@@ -9,7 +9,7 @@ from torchvision.utils import make_grid
 import models
 
 
-def plot_metrics(metrics):
+def plot_metrics(args, metrics):
     # Plot training metrics
     f, ax = plt.subplots(1, 1)
     f.set_size_inches(15, 4)
@@ -23,6 +23,8 @@ def plot_metrics(metrics):
         loss = metrics.loss(subset)
         ax.plot(np.linspace(0, nepochs, len(loss)), loss, label=subset)
     ax.legend()
+
+    f.savefig(os.path.join(args.outdir, 'metrics.jpg'))
 
 
 def plot_plca_recon(args, sample_img, model):

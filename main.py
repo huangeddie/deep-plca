@@ -58,7 +58,7 @@ def run(args):
     metrics = train.train(args, model, train_loader, test_loader)
 
     # Plot work
-    plots.plot_metrics(metrics)
+    plots.plot_metrics(args, metrics)
     imgs, _ = next(iter(train_loader))
     plots.plot_recon(args, imgs[:1], model)
 
