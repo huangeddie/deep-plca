@@ -181,6 +181,7 @@ def train(args, model, train_loader, test_loader):
 
             pbar.set_postfix_str(metrics.status_str())
         except KeyboardInterrupt:
+            print('keyboard interrupt caught. ending training early')
             break
 
     return metrics
