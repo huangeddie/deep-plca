@@ -1,1 +1,2 @@
-# plca
+# PLCA
+Probabilistic latent component analysis
