@@ -128,11 +128,11 @@ def loop_data(args, model, data_loader, opt=None):
             opt.zero_grad()
 
             # Train steps defined seperately for each model
-        if isinstance(model, models.ConvPCLA):
+        if isinstance(model, models.plca.ConvPLCA):
             loss, recon_loss = pcla_step(args, model, imgs)
-        elif isinstance(model, models.AutoEncoder):
+        elif isinstance(model, models.auto.AutoEncoder):
             loss, recon_loss = ae_step(args, model, imgs)
-        elif isinstance(model, models.AutoLayer):
+        elif isinstance(model, models.auto.AutoLayer):
             loss, recon_loss = al_step(args, model, imgs)
         else:
             raise Exception(f'unknown model {model}')

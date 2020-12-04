@@ -17,8 +17,8 @@ parser.add_argument('--prob', action='store_true',
                     help='makes the images probability distributions')
 
 # Model
-parser.add_argument('--model', choices=['pcla', 'ae', 'al'],
-                    help='deep pcla, auto encoder, auto layer')
+parser.add_argument('--model', choices=['conv-plca', 'deep-plca', 'ae', 'al'],
+                    help='conv-plca, deep pcla, auto encoder, auto layer')
 parser.add_argument('--zdim', type=int, default=None,
                     help='dimension of the embedding space. only for encoders')
 parser.add_argument('--new', action='store_true',

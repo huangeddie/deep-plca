@@ -2,13 +2,15 @@ import os
 
 import torch
 
-from models.ae import AutoLayer, AutoEncoder
-from models.deep_plca import ConvPCLA
+from models.auto import AutoLayer, AutoEncoder
+from models import plca
 
 
 def make_model(args, channels):
-    if args.model == 'pcla':
-        model = ConvPCLA(channels, args.imsize, args.nkern, args.kern_size)
+    if args.model == 'conv-plca':
+        model = plca.ConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
+    elif args.model == 'deep-plca':
+        model = plca.DeepPLCA(channels, args.imsize, args.nkern, args.kern_size)
     elif args.model == 'ae':
         model = AutoEncoder(channels, args.imsize, args.zdim)
     elif args.model == 'al':
