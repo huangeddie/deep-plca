@@ -8,7 +8,7 @@ import plots
 parser = argparse.ArgumentParser()
 
 # Output
-parser.add_argument('--out', type=str, help='directory to save all work')
+parser.add_argument('--outdir', type=str, help='directory to save all work')
 
 # Data
 parser.add_argument('--data', type=str, help='dataset')
@@ -61,7 +61,7 @@ def run(args):
     imgs, _ = next(iter(train_loader))
     plots.plot_recon(args, imgs[:1], model)
 
-    print(f'work saved to {args.out}')
+    print(f'work saved to {args.outdir}')
 
 if __name__ == '__main__':
     args = parser.parse_args()

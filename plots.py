@@ -76,7 +76,7 @@ def plot_pcla_recon(args, sample_img, model):
     ax[1, 2].remove()
     plt.show()
 
-    f.savefig(os.path.join(args.out, 'recon.jpg'))
+    f.savefig(os.path.join(args.outdir, 'recon.jpg'))
 
     # Plot top components
     f, ax = plt.subplots(1, 6)
@@ -91,7 +91,7 @@ def plot_pcla_recon(args, sample_img, model):
         img = make_grid(component.cpu(), normalize=True)
         ax[i].imshow(img.permute(1, 2, 0))
 
-    f.savefig(os.path.join(args.out, 'comp.jpg'))
+    f.savefig(os.path.join(args.outdir, 'comp.jpg'))
 
 
 def plot_ae_recon(args, sample_img, model):
