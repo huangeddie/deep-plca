@@ -164,7 +164,8 @@ def train(args, model, train_loader, test_loader):
         raise Exception(f'unknown optimizer {args.opt}')
 
     # Train
-    for e in range(args.epochs):
+    print('training')
+    for e in range(1, args.epochs + 1):
         try:
             # Train
             loss = loop_data(args, model, train_loader, opt)
