@@ -18,15 +18,15 @@ parser.add_argument('--prob', action='store_true',
 
 # Model
 parser.add_argument('--model', choices=['conv-plca', 'deep-plca', 'ae', 'al'],
-                    help='conv-plca, deep pcla, auto encoder, auto layer')
+                    help='conv-plca, deep plca, auto encoder, auto layer')
 parser.add_argument('--zdim', type=int, default=None,
                     help='dimension of the embedding space. only for encoders')
-parser.add_argument('--new', action='store_true',
-                    help='use new weights instead of loading weights from previous run')
+parser.add_argument('--load', action='store_true',
+                    help='load weights from previous run instead of using new weights')
 parser.add_argument('--nkern', type=int, default=None,
-                    help='number of kernels. only for pcla')
+                    help='number of kernels. only for plca')
 parser.add_argument('--kern-size', type=int, default=None,
-                    help='kernel size. only for pcla')
+                    help='kernel size. only for plca')
 
 # Training
 parser.add_argument('--opt', type=str, help='optimizer')
@@ -36,7 +36,7 @@ parser.add_argument('--epochs', type=int)
 
 # Losses
 parser.add_argument('--recon', choices=['ce', 'bce', 'mse', 'kl'],
-                    help='reconstruction loss. [cross entropy, binary cross entropy, mean squared error]')
+                    help='reconstruction loss. [cross entropy, binary cross entropy, mean squared error, KL divergence]')
 parser.add_argument('--beta1', type=float, help='prior entropy')
 parser.add_argument('--beta2', type=float, help='impulse entropy')
 parser.add_argument('--beta3', type=float, help='feature entropy')

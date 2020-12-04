@@ -25,7 +25,7 @@ def plot_metrics(metrics):
     ax.legend()
 
 
-def plot_pcla_recon(args, sample_img, model):
+def plot_plca_recon(args, sample_img, model):
     torch.set_grad_enabled(False)
     model.eval(), model.cuda()
 
@@ -145,8 +145,8 @@ def plot_al_recon(args, sample_img, model):
 
 
 def plot_recon(args, imgs, model):
-    if isinstance(model, models.ConvPCLA):
-        plot_pcla_recon(args, imgs, model)
+    if isinstance(model, models.ConvPLCA):
+        plot_plca_recon(args, imgs, model)
     elif isinstance(model, models.AutoEncoder):
         plot_ae_recon(args, imgs, model)
     elif isinstance(model, models.AutoLayer):
