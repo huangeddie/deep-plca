@@ -19,6 +19,10 @@ parser.add_argument('--prob', action='store_true',
 # Model
 parser.add_argument('--model', choices=['conv-plca', 'deep-plca', 'ae', 'al'],
                     help='conv-plca, deep plca, auto encoder, auto layer')
+parser.add_argument('--nconvs', type=int, default=None,
+                    help='number of convolutions to use per impulse and prior (only for deep-plca)')
+parser.add_argument('--hdim', type=int, default=None,
+                    help='dimension of the hidden layers (only for deep-plca)')
 parser.add_argument('--zdim', type=int, default=None,
                     help='dimension of the embedding space. only for encoders')
 parser.add_argument('--load', action='store_true',

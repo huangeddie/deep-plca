@@ -8,54 +8,58 @@ class DeepPLCA(nn.Module):
     Priors and impulse are deep CNN functions of the image, while the features are global parameters
     """
 
-    def __init__(self, channels, imsize, nkern, kern_size):
+    def __init__(self, channels, imsize, nkern, kern_size, nconvs, hdim):
         super().__init__()
         self.nkern = nkern
-        hdim = 256
 
-        # Impulse
+        assert nconvs >= 1, nconvs
+
+        # Priors and impulse
+
+        # Initial convolutions
         impulse_size = imsize - kern_size + 1
-        self.impulse = nn.Sequential(
+        impulse = [
             nn.BatchNorm2d(channels),
-            nn.Conv2d(channels, hdim, kern_size),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, hdim, 3, 1, 1),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, hdim, 3, 1, 1),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, nkern, 3, 1, 1),
+            nn.Conv2d(channels, hdim, kern_size)
+        ]
+
+        prior = [
+            nn.BatchNorm2d(channels),
+            nn.Conv2d(channels, hdim, kern_size)
+        ]
+
+        # Add additional non-linear convolution layers
+        for _ in range(nconvs - 1):
+            impulse.extend([
+                nn.BatchNorm2d(hdim),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(hdim, hdim, 3, 1, 1),
+            ])
+
+            prior.extend([
+                nn.BatchNorm2d(hdim),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(hdim, hdim, 3, 1, 1),
+            ])
+
+        # Softmax impulse
+        impulse.extend([
             nn.Flatten(start_dim=2),
             nn.Softmax(-1),
             nn.Unflatten(dim=2, unflattened_size=(impulse_size, impulse_size))
-        )
+        ])
 
-        # Prior
-        self.prior = nn.Sequential(
-            nn.BatchNorm2d(channels),
-            nn.Conv2d(channels, hdim, kern_size),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, hdim, 3, 1, 1),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, hdim, 3, 1, 1),
-            nn.BatchNorm2d(hdim),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hdim, nkern, 3, 1, 1),
+        # Pool and softmax prior
+        prior.extend([
             nn.AdaptiveAvgPool2d(1),
             nn.Softmax(dim=1)
-        )
+        ])
 
-        # Features a.k.a kernels
-        self.softmax_feats = nn.Sequential(
-            nn.Flatten(start_dim=1),
-            nn.Softmax(dim=-1),
-            nn.Unflatten(1, (channels, kern_size, kern_size))
-        )
+        # Make into modules
+        self.impulse = nn.Sequential(impulse)
+        self.prior = nn.Sequential(prior)
 
+        # Features
         self.feat_logits = nn.Parameter(torch.randn(nkern, channels, kern_size, kern_size))
 
     def forward(self, imgs):

@@ -10,7 +10,7 @@ def make_model(args, channels):
     if args.model == 'conv-plca':
         model = plca.ConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
     elif args.model == 'deep-plca':
-        model = plca.DeepPLCA(channels, args.imsize, args.nkern, args.kern_size)
+        model = plca.DeepPLCA(channels, args.imsize, args.nkern, args.kern_size, args.nconvs, args.hdim)
     elif args.model == 'ae':
         model = AutoEncoder(channels, args.imsize, args.zdim)
     elif args.model == 'al':
