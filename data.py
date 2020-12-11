@@ -1,6 +1,19 @@
 from torch.utils import data
-from torchvision import transforms, datasets
+from torchvision import transforms,
+import torchvision.datasets.utils as utils
+from torchvision import datasets
+from zipfile import ZipFile
+import os
+import torch
 
+
+def _download(url, name, path_download = './'):
+    utils.download_url(url, root=path_download, filename = name + '.zip', md5 = None)
+
+def _unzip(path_zip, path_extract = './'):
+    with ZipFile(path_zip, 'r') as zipObj:
+        zipObj.extractall(path = path_extract)
+    os.remove(path_zip)
 
 def center_crop_square(im, size):
     width, height = im.size  # Get dimensions
@@ -45,6 +58,12 @@ def load_data(args, shuffle, droplast):
     elif args.data == 'cifar100':
         train_data = datasets.CIFAR100('./', train=True, transform=transform, download=True)
         test_data = datasets.CIFAR100('./', train=False, transform=transform, download=True)
+    elif args.data == 'yale':
+        _download('yale_DB','http://vision.ucsd.edu/extyaleb/CroppedYaleBZip/CroppedYale.zip')
+        _unzip('./yale_DB.zip')
+        dataset = datasets.ImageFolder('CroppedYale', transform = transform)
+        train_data, test_data = torch.utils.data.random_split(dataset, lengths= [2000,452])
+
     else:
         raise Exception(f'unknown data {args.data}')
 
