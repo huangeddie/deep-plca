@@ -29,17 +29,18 @@ class DeepPLCA(nn.Module):
         ]
 
         # Add additional non-linear convolution layers
-        for _ in range(nconvs - 1):
+        for i in range(nconvs - 1):
+            out_dim = channels if i == nconvs - 2 else hdim
             impulse.extend([
                 nn.BatchNorm2d(hdim),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(hdim, hdim, 3, 1, 1),
+                nn.Conv2d(hdim, out_dim, 3, 1, 1),
             ])
 
             prior.extend([
                 nn.BatchNorm2d(hdim),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(hdim, hdim, 3, 1, 1),
+                nn.Conv2d(hdim, out_dim, 3, 1, 1),
             ])
 
         # Softmax impulse
