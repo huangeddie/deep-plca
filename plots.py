@@ -17,10 +17,10 @@ def plot_metrics(args, metrics):
     nepochs = metrics.nepochs()
 
     # Loss
-    ax.set_title('loss')
+    ax.set_title('recon loss')
     ax.set_xlabel('epochs')
     for subset in ['train', 'test']:
-        loss = metrics.loss(subset)
+        loss = metrics.recon_loss(subset)
         ax.plot(np.linspace(0, nepochs, len(loss)), loss, label=subset)
     ax.legend()
 

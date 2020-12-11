@@ -9,22 +9,22 @@ import models
 
 class Metrics:
     def __init__(self):
-        self._loss = {'train': [], 'test': []}
+        self._recon_loss = {'train': [], 'test': []}
 
-    def add_epoch_loss(self, subset, loss):
-        self._loss[subset].append(loss)
+    def add_epoch_recon_loss(self, subset, loss):
+        self._recon_loss[subset].append(loss)
 
-    def loss(self, subset):
-        return np.array(self._loss[subset]).flatten()
+    def recon_loss(self, subset):
+        return np.array(self._recon_loss[subset]).flatten()
 
     def nepochs(self):
-        n = len(self._loss['train'])
+        n = len(self._recon_loss['train'])
         return n
 
     def status_str(self):
-        m = [np.mean(self._loss['train'][-1]),
-             np.mean(self._loss['test'][-1])]
-        return f'(train/test): {m[0]:.3}/{m[1]:.3} loss'
+        m = [np.mean(self._recon_loss['train'][-1]),
+             np.mean(self._recon_loss['test'][-1])]
+        return f'(train/test): {m[0]:.3}/{m[1]:.3} recon loss'
 
 
 #### Losses
@@ -118,7 +118,7 @@ def loop_data(args, model, data_loader, opt=None):
     training = opt is not None
     torch.set_grad_enabled(training), model.cuda()
 
-    losses = []
+    recon_losses = []
     pbar = tqdm(data_loader, '\ttrain' if training else '\ttest', mininterval=1)
     model.train(training)
     for imgs, _ in pbar:
@@ -143,11 +143,10 @@ def loop_data(args, model, data_loader, opt=None):
             opt.step()
 
         # Record
-        losses.append(recon_loss.item())
-        pbar_str = f'{losses[-1]:.3} loss'
-        pbar.set_postfix_str(pbar_str, refresh=False)
+        recon_losses.append(recon_loss.item())
+        pbar.set_postfix_str(f'{recon_losses[-1]:.3} recon loss', refresh=False)
 
-    return losses
+    return recon_losses
 
 
 def train(args, model, train_loader, test_loader):
@@ -167,15 +166,15 @@ def train(args, model, train_loader, test_loader):
     for e in range(1, args.epochs + 1):
         try:
             # Train
-            loss = loop_data(args, model, train_loader, opt)
-            metrics.add_epoch_loss('train', loss)
+            recon_loss = loop_data(args, model, train_loader, opt)
+            metrics.add_epoch_recon_loss('train', recon_loss)
 
             # Save
             torch.save(model.state_dict(), args.save)
 
             # Test
-            loss = loop_data(args, model, test_loader)
-            metrics.add_epoch_loss('test', loss)
+            recon_loss = loop_data(args, model, test_loader)
+            metrics.add_epoch_recon_loss('test', recon_loss)
 
             print(f'epoch {e} - {metrics.status_str()}', flush=True)
         except KeyboardInterrupt:
