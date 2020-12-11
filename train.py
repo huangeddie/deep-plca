@@ -127,8 +127,8 @@ def loop_data(args, model, data_loader, opt=None):
         if training:
             opt.zero_grad()
 
-            # Train steps defined seperately for each model
-        if isinstance(model, models.plca.ConvPLCA):
+        # Train steps defined seperately for each model
+        if isinstance(model, models.plca.ConvPLCA) or isinstance(model, models.plca.DeepPLCA):
             loss, recon_loss = plca_step(args, model, imgs)
         elif isinstance(model, models.auto.AutoEncoder):
             loss, recon_loss = ae_step(args, model, imgs)
