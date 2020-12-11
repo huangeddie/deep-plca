@@ -62,6 +62,12 @@ class DeepPLCA(nn.Module):
         # Features
         self.feat_logits = nn.Parameter(torch.randn(nkern, channels, kern_size, kern_size))
 
+        self.softmax_feats = nn.Sequential(
+            nn.Flatten(start_dim=1),
+            nn.Softmax(dim=-1),
+            nn.Unflatten(1, (channels, kern_size, kern_size))
+        )
+
     def forward(self, imgs):
         # Features
         feats = self.softmax_feats(self.feat_logits)
