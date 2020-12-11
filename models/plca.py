@@ -56,8 +56,8 @@ class DeepPLCA(nn.Module):
         ])
 
         # Make into modules
-        self.impulse = nn.Sequential(impulse)
-        self.prior = nn.Sequential(prior)
+        self.impulse = nn.Sequential(*impulse)
+        self.prior = nn.Sequential(*prior)
 
         # Features
         self.feat_logits = nn.Parameter(torch.randn(nkern, channels, kern_size, kern_size))
@@ -85,7 +85,8 @@ class ConvPLCA(nn.Module):
     """
     Let params be the core nkern x channels x kern_size x kern_size parameters that influences everything
     The impulse convolutional kernels are generated from a learnable per-kernel affine transformation from params
-    The feature logits are generated from a learnable per-kernel linear transformation from params  (it’s linear and not affine because the feature logits are then immediately fed into the soft max activation which is shift invariant
+    The feature logits are generated from a learnable per-kernel linear transformation from params
+    (it’s linear and not affine because the feature logits are then immediately fed into the soft max activation which is shift invariant
     The priors are global
     """
 
