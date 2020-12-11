@@ -147,7 +147,7 @@ def plot_al_recon(args, sample_img, model):
 
 
 def plot_recon(args, imgs, model):
-    if isinstance(model, models.plca.ConvPLCA):
+    if isinstance(model, models.plca.ConvPLCA) or isinstance(model, models.plca.DeepPLCA):
         plot_plca_recon(args, imgs, model)
     elif isinstance(model, models.auto.AutoEncoder):
         plot_ae_recon(args, imgs, model)
