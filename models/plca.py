@@ -100,7 +100,7 @@ def project_simplex_sort(v, z=1):
     """
     n_features = v.shape[0]
     u, _ = torch.sort(v, descending=True)
-    cssv = torch.cumsum(u) - z
+    cssv = torch.cumsum(u, 0) - z
     ind = torch.arange(n_features) + 1
     cond = u - cssv / ind > 0
     rho = ind[cond][-1]
@@ -137,17 +137,16 @@ class ProjConvPLCA(PLCA):
         """
         # Priors
         simplex_priors = self.priors.detach()
-        kern_shape = self.priors.shape[1:]
-        for i in range(self.nkern):
-            simplex_priors[i] = project_simplex_sort(simplex_priors[i].flatten()).view(kern_shape)
-        self.priors.copy_(simplex_priors)
+        priors_shape = self.priors.shape
+        simplex_priors = project_simplex_sort(simplex_priors.flatten()).view(priors_shape)
+        self.priors.data.copy_(simplex_priors)
 
         # Features
         simplex_feats = self.feats.detach()
         kern_shape = self.feats.shape[1:]
         for i in range(self.nkern):
             simplex_feats[i] = project_simplex_sort(simplex_feats[i].flatten()).view(kern_shape)
-        self.feats.copy_(simplex_feats)
+        self.feats.data.copy_(simplex_feats)
 
     def forward(self, imgs):
         # Impulse
