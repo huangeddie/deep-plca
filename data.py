@@ -1,5 +1,5 @@
 from torch.utils import data
-from torchvision import transforms,
+from torchvision import transforms
 import torchvision.datasets.utils as utils
 from torchvision import datasets
 from zipfile import ZipFile
