@@ -139,7 +139,7 @@ class ProjConvPLCA(PLCA):
         self.project_params_to_simplex()
 
     def forward(self, imgs):
-        self.temp.clamp_(min=1)
+        self.temp.data.clamp_(min=1)
 
         # Priors
         prior_logits = F.conv2d(imgs, self.feats)
