@@ -101,7 +101,7 @@ def project_simplex_sort(v, z=1):
     n_features = v.shape[0]
     u, _ = torch.sort(v, descending=True)
     cssv = torch.cumsum(u, 0) - z
-    ind = torch.arange(n_features) + 1
+    ind = torch.arange(n_features, device=v.device) + 1
     cond = u - cssv / ind > 0
     rho = ind[cond][-1]
     theta = cssv[cond][-1] / float(rho)
