@@ -8,7 +8,7 @@ from models import plca
 
 def make_model(args, channels):
     if args.model == 'proj-conv-plca':
-        model = plca.ProjConvPLCA(channels, args.nkern, args.kern_size)
+        model = plca.ProjConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
     elif args.model == 'soft-conv-plca':
         model = plca.SoftConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
     elif args.model == 'deep-plca':
