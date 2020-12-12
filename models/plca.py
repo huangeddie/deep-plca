@@ -130,7 +130,7 @@ class ProjConvPLCA(PLCA):
         super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
 
-        self.temp = 0.5
+        self.temp = 1
 
         # Core parameters
         self.feats = nn.Parameter(torch.rand(nkern, channels, kern_size, kern_size))
