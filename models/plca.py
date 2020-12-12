@@ -130,7 +130,7 @@ class ProjConvPLCA(PLCA):
         super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
 
-        self.temp = 0.01
+        self.temp = nn.Parameter(torch.tensor(1))
 
         # Core parameters
         self.feats = nn.Parameter(torch.rand(nkern, channels, kern_size, kern_size))
@@ -139,6 +139,8 @@ class ProjConvPLCA(PLCA):
         self.project_params_to_simplex()
 
     def forward(self, imgs):
+        self.temp.clamp_(min=1)
+
         # Priors
         prior_logits = F.conv2d(imgs, self.feats)
         prior_logits = F.adaptive_max_pool2d(prior_logits, 1)
@@ -146,7 +148,7 @@ class ProjConvPLCA(PLCA):
 
         # Impulse
         impulse_logits = F.conv2d(imgs, self.feats)
-        impulse = self.softmax_impulse(impulse_logits / self.temp)
+        impulse = self.softmax_impulse(impulse_logits * self.temp)
 
         # Convolutional transpose
         recon = F.conv_transpose2d(priors * impulse, self.feats)
