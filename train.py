@@ -141,6 +141,7 @@ def loop_data(args, model, data_loader, opt=None):
         if training:
             loss.backward()
             opt.step()
+            
             if isinstance(model, models.plca.ProjConvPLCA):
                 model.project_params_to_simplex()
 

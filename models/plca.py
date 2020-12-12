@@ -128,10 +128,12 @@ class ProjConvPLCA(PLCA):
         # Priors
         self.priors = nn.Parameter(torch.rand(1, nkern, 1, 1))
 
+        # Project parameters to simplex
+        self.project_params_to_simplex()
+
     def project_params_to_simplex(self):
         """
-        Simple algorithm: https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf
-        Takes O(d log d) time where d is the number of dimensions.
+        This function must be called every time after the gradient descent step.
         """
         # Priors
         simplex_priors = self.priors.detach()
