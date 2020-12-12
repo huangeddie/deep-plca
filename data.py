@@ -10,7 +10,7 @@ import torch
 def _download(url, name, path_download = './'):
     utils.download_url(url, root=path_download, filename = name + '.zip', md5 = None)
 
-def _check_exists(self, path):
+def _check_exists(path):
     return os.path.exists(path)
 
 def _unzip(path_zip, path_extract = './'):
