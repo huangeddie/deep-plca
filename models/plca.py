@@ -3,7 +3,11 @@ from torch import nn
 from torch.nn import functional as F
 
 
-class DeepPLCA(nn.Module):
+class PLCA(nn.Module):
+    pass
+
+
+class DeepPLCA(PLCA):
     """
     Priors and impulse are deep CNN functions of the image, while the features are global parameters
     """
@@ -88,7 +92,78 @@ class DeepPLCA(nn.Module):
         return recon, priors, impulse, feats
 
 
-class ConvPLCA(nn.Module):
+def project_simplex_sort(v, z=1):
+    """
+    Projects a vector onto the simplex
+    Takes O(d log d) time where d is the dimension of the vector.
+    https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf
+    """
+    n_features = v.shape[0]
+    u = torch.sort(v)[::-1]
+    cssv = torch.cumsum(u) - z
+    ind = torch.arange(n_features) + 1
+    cond = u - cssv / ind > 0
+    rho = ind[cond][-1]
+    theta = cssv[cond][-1] / float(rho)
+    w = torch.maximum(v - theta, torch.zeros_like(v))
+    return w
+
+
+class ProjConvPLCA(PLCA):
+    """
+    Let params be the core nkern x channels x kern_size x kern_size parameters that influences everything
+    The impulse convolutional kernels are generated from a learnable per-kernel affine transformation from params
+    The feature logits are generated from a learnable per-kernel linear transformation from params
+    (it’s linear and not affine because the feature logits are then immediately fed into the soft max activation which is shift invariant
+    The priors are global
+    """
+
+    def __init__(self, channels, nkern, kern_size):
+        super().__init__()
+        self.nkern = nkern
+
+        # Core parameters
+        self.feats = nn.Parameter(torch.rand(nkern, channels, kern_size, kern_size))
+
+        # Priors
+        self.priors = nn.Parameter(torch.rand(1, nkern, 1, 1))
+
+        # Project parameters to simplex
+        self.project_params_to_simplex()
+
+    def project_params_to_simplex(self):
+        """
+        This function must be called every time after the gradient descent step.
+        """
+        # Priors
+        simplex_priors = self.priors.detach()
+        kern_shape = self.priors.shape[1:]
+        for i in range(self.nkern):
+            simplex_priors[i] = project_simplex_sort(simplex_priors[i].flatten()).view(kern_shape)
+        self.priors.copy_(simplex_priors)
+
+        # Features
+        simplex_feats = self.feats.detach()
+        kern_shape = self.feats.shape[1:]
+        for i in range(self.nkern):
+            simplex_feats[i] = project_simplex_sort(simplex_feats[i].flatten()).view(kern_shape)
+        self.feats.copy_(simplex_feats)
+
+    def forward(self, imgs):
+        # Impulse
+        impulse_logits = F.conv2d(imgs, self.feats)
+        impulse = impulse_logits / torch.sum(impulse_logits, dim=(2, 3), keepdim=True)
+
+        # Convolutional transpose
+        recon = F.conv_transpose2d(self.priors * impulse, self.feats)
+
+        # For some reason, when run on CUDA, there can be negative values
+        # recon.clamp_(min=0)
+
+        return recon, self.priors.detach(), impulse, self.feats.detach()
+
+
+class SoftConvPLCA(PLCA):
     """
     Let params be the core nkern x channels x kern_size x kern_size parameters that influences everything
     The impulse convolutional kernels are generated from a learnable per-kernel affine transformation from params

@@ -17,7 +17,7 @@ parser.add_argument('--prob', action='store_true',
                     help='makes the images probability distributions')
 
 # Model
-parser.add_argument('--model', choices=['conv-plca', 'deep-plca', 'ae', 'al'],
+parser.add_argument('--model', choices=['proj-conv-plca', 'soft-conv-plca', 'deep-plca', 'ae', 'al'],
                     help='conv-plca, deep plca, auto encoder, auto layer')
 parser.add_argument('--nconvs', type=int, default=None,
                     help='number of convolutions to use per impulse and prior (only for deep-plca)')
