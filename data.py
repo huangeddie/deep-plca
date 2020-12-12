@@ -59,7 +59,7 @@ def load_data(args, shuffle, droplast):
         train_data = datasets.CIFAR100('./', train=True, transform=transform, download=True)
         test_data = datasets.CIFAR100('./', train=False, transform=transform, download=True)
     elif args.data == 'yale':
-        _download('yale_DB','http://vision.ucsd.edu/extyaleb/CroppedYaleBZip/CroppedYale.zip')
+        _download('http://vision.ucsd.edu/extyaleb/CroppedYaleBZip/CroppedYale.zip', 'yale_DB')
         _unzip('./yale_DB.zip')
         dataset = datasets.ImageFolder('CroppedYale', transform = transform)
         train_data, test_data = torch.utils.data.random_split(dataset, lengths= [2000,452])
