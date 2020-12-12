@@ -157,12 +157,6 @@ class ProjConvPLCA(PLCA):
         """
         This function must be called every time after the gradient descent step.
         """
-        # Priors
-        simplex_priors = self.priors.detach()
-        priors_shape = self.priors.shape
-        simplex_priors = project_simplex_sort(simplex_priors.flatten()).view(priors_shape)
-        self.priors.data.copy_(simplex_priors)
-
         # Features
         simplex_feats = self.feats.detach()
         kern_shape = self.feats.shape[1:]
