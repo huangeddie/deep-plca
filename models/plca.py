@@ -154,7 +154,7 @@ class ProjConvPLCA(PLCA):
     def forward(self, imgs):
         # Priors
         prior_logits = F.conv2d(imgs, self.feats)
-        prior_logits = F.adaptive_max_pool2d(prior_logits, 1)
+        prior_logits = F.adaptive_avg_pool2d(prior_logits, 1)
         priors = prior_logits / prior_logits.sum(dim=1, keepdim=True)
 
         # Impulse
