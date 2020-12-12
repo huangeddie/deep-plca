@@ -4,7 +4,21 @@ from torch.nn import functional as F
 
 
 class PLCA(nn.Module):
-    pass
+    def __init__(self, channels, imsize, kern_size):
+        super().__init__()
+
+        impulse_size = imsize - kern_size + 1
+        self.softmax_impulse = nn.Sequential(
+            nn.Flatten(start_dim=2),
+            nn.Softmax(-1),
+            nn.Unflatten(dim=2, unflattened_size=(impulse_size, impulse_size))
+        )
+
+        self.softmax_feats = nn.Sequential(
+            nn.Flatten(start_dim=1),
+            nn.Softmax(dim=-1),
+            nn.Unflatten(1, (channels, kern_size, kern_size))
+        )
 
 
 class DeepPLCA(PLCA):
@@ -13,7 +27,7 @@ class DeepPLCA(PLCA):
     """
 
     def __init__(self, channels, imsize, nkern, kern_size, nconvs, hdim):
-        super().__init__()
+        super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
 
         assert nconvs >= 1, nconvs
@@ -67,12 +81,6 @@ class DeepPLCA(PLCA):
         # Features
         self.feat_logits = nn.Parameter(torch.randn(nkern, channels, kern_size, kern_size))
 
-        self.softmax_feats = nn.Sequential(
-            nn.Flatten(start_dim=1),
-            nn.Softmax(dim=-1),
-            nn.Unflatten(1, (channels, kern_size, kern_size))
-        )
-
     def forward(self, imgs):
         # Features
         feats = self.softmax_feats(self.feat_logits)
@@ -118,18 +126,32 @@ class ProjConvPLCA(PLCA):
     The priors are global
     """
 
-    def __init__(self, channels, nkern, kern_size):
-        super().__init__()
+    def __init__(self, channels, imsize, nkern, kern_size):
+        super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
+
+        self.temp = 0.1
 
         # Core parameters
         self.feats = nn.Parameter(torch.rand(nkern, channels, kern_size, kern_size))
 
-        # Priors
-        self.priors = nn.Parameter(torch.rand(1, nkern, 1, 1))
-
         # Project parameters to simplex
         self.project_params_to_simplex()
+
+    def forward(self, imgs):
+        # Priors
+        prior_logits = F.conv2d(imgs, self.feats)
+        prior_logits = F.adaptive_max_pool2d(prior_logits, 1)
+        priors = prior_logits / prior_logits.sum(dim=1, keepdim=True)
+
+        # Impulse
+        impulse_logits = F.conv2d(imgs, self.feats)
+        impulse = self.softmax_impulse(impulse_logits / self.temp)
+
+        # Convolutional transpose
+        recon = F.conv_transpose2d(priors * impulse, self.feats)
+
+        return recon, priors, impulse, self.feats.detach()
 
     def project_params_to_simplex(self):
         """
@@ -148,19 +170,6 @@ class ProjConvPLCA(PLCA):
             simplex_feats[i] = project_simplex_sort(simplex_feats[i].flatten()).view(kern_shape)
         self.feats.data.copy_(simplex_feats)
 
-    def forward(self, imgs):
-        # Impulse
-        impulse_logits = F.conv2d(imgs, self.feats)
-        impulse = impulse_logits / torch.sum(impulse_logits, dim=(2, 3), keepdim=True)
-
-        # Convolutional transpose
-        recon = F.conv_transpose2d(self.priors * impulse, self.feats)
-
-        # For some reason, when run on CUDA, there can be negative values
-        # recon.clamp_(min=0)
-
-        return recon, self.priors.detach(), impulse, self.feats.detach()
-
 
 class SoftConvPLCA(PLCA):
     """
@@ -172,7 +181,7 @@ class SoftConvPLCA(PLCA):
     """
 
     def __init__(self, channels, imsize, nkern, kern_size):
-        super().__init__()
+        super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
 
         # Core parameters
@@ -189,20 +198,9 @@ class SoftConvPLCA(PLCA):
         self.impulse_b = nn.Parameter(torch.rand(nkern, 1, 1, 1))
 
         impulse_size = imsize - kern_size + 1
-        self.softmax_impulse = nn.Sequential(
-            nn.Flatten(start_dim=2),
-            nn.Softmax(-1),
-            nn.Unflatten(dim=2, unflattened_size=(impulse_size, impulse_size))
-        )
 
         # Features a.k.a kernels
         self.feat_w = nn.Parameter(torch.rand(nkern, 1, 1, 1))
-
-        self.softmax_feats = nn.Sequential(
-            nn.Flatten(start_dim=1),
-            nn.Softmax(dim=-1),
-            nn.Unflatten(1, (channels, kern_size, kern_size))
-        )
 
     def impulse_affine(self, params):
         return self.impulse_w * params + self.impulse_b
