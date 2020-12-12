@@ -10,6 +10,9 @@ import torch
 def _download(url, name, path_download = './'):
     utils.download_url(url, root=path_download, filename = name + '.zip', md5 = None)
 
+def _check_exists(self, path):
+    return os.path.exists(path)
+
 def _unzip(path_zip, path_extract = './'):
     with ZipFile(path_zip, 'r') as zipObj:
         zipObj.extractall(path = path_extract)
@@ -59,8 +62,9 @@ def load_data(args, shuffle, droplast):
         train_data = datasets.CIFAR100('./', train=True, transform=transform, download=True)
         test_data = datasets.CIFAR100('./', train=False, transform=transform, download=True)
     elif args.data == 'yale':
-        _download('http://vision.ucsd.edu/extyaleb/CroppedYaleBZip/CroppedYale.zip', 'yale_DB')
-        _unzip('./yale_DB.zip')
+        if not _check_exists('./CroppedYale'):
+            _download('http://vision.ucsd.edu/extyaleb/CroppedYaleBZip/CroppedYale.zip', 'yale_DB')
+            _unzip('./yale_DB.zip')
         dataset = datasets.ImageFolder('CroppedYale', transform = transform)
         train_data, test_data = torch.utils.data.random_split(dataset, lengths= [2000,452])
 
