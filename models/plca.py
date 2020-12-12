@@ -99,7 +99,7 @@ def project_simplex_sort(v, z=1):
     https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf
     """
     n_features = v.shape[0]
-    u = torch.sort(v)[::-1]
+    u = torch.sort(v, descending=True)
     cssv = torch.cumsum(u) - z
     ind = torch.arange(n_features) + 1
     cond = u - cssv / ind > 0
