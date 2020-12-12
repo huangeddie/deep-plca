@@ -7,8 +7,10 @@ from models import plca
 
 
 def make_model(args, channels):
-    if args.model == 'conv-plca':
-        model = plca.ConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
+    if args.model == 'proj-conv-plca':
+        model = plca.ProjConvPLCA(channels, args.nkern, args.kern_size)
+    elif args.model == 'soft-conv-plca':
+        model = plca.SoftConvPLCA(channels, args.imsize, args.nkern, args.kern_size)
     elif args.model == 'deep-plca':
         model = plca.DeepPLCA(channels, args.imsize, args.nkern, args.kern_size, args.nconvs, args.hdim)
     elif args.model == 'ae':

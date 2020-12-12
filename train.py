@@ -73,7 +73,7 @@ def get_recon_loss(args, recon, imgs):
 #### Steps
 
 def plca_step(args, model, imgs):
-    # Deep PLCA
+    # PLCA
     recon, priors, impulse, feat = model(imgs)
 
     # Entropy loss
@@ -128,7 +128,7 @@ def loop_data(args, model, data_loader, opt=None):
             opt.zero_grad()
 
         # Train steps defined seperately for each model
-        if isinstance(model, models.plca.ConvPLCA) or isinstance(model, models.plca.DeepPLCA):
+        if isinstance(model, models.plca.PLCA):
             loss, recon_loss = plca_step(args, model, imgs)
         elif isinstance(model, models.auto.AutoEncoder):
             loss, recon_loss = ae_step(args, model, imgs)
@@ -141,6 +141,8 @@ def loop_data(args, model, data_loader, opt=None):
         if training:
             loss.backward()
             opt.step()
+            if isinstance(model, models.plca.ProjConvPLCA):
+                model.project_params_to_simplex()
 
         # Record
         recon_losses.append(recon_loss.item())
