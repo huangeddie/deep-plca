@@ -130,25 +130,36 @@ class ProjConvPLCA(PLCA):
         super().__init__(channels, imsize, kern_size)
         self.nkern = nkern
 
-        self.temp = nn.Parameter(torch.tensor(1).float())
-
         # Core parameters
         self.feats = nn.Parameter(torch.rand(nkern, channels, kern_size, kern_size))
+
+        hdim = 256
+        self.impulse = nn.Sequential(
+            nn.BatchNorm2d(channels),
+            nn.Conv2d(channels, hdim, kern_size),
+            nn.BatchNorm2d(hdim),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hdim, hdim, 3, 1, 1),
+            nn.BatchNorm2d(hdim),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hdim, hdim, 3, 1, 1),
+            nn.BatchNorm2d(hdim),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hdim, nkern, 3, 1, 1)
+        )
 
         # Project parameters to simplex
         self.project_params_to_simplex()
 
     def forward(self, imgs):
-        self.temp.data.clamp_(min=1)
-
         # Priors
         prior_logits = F.conv2d(imgs, self.feats)
         prior_logits = F.adaptive_max_pool2d(prior_logits, 1)
         priors = prior_logits / prior_logits.sum(dim=1, keepdim=True)
 
         # Impulse
-        impulse_logits = F.conv2d(imgs, self.feats)
-        impulse = self.softmax_impulse(impulse_logits * self.temp)
+        impulse_logits = self.impulse(imgs)
+        impulse = self.softmax_impulse(impulse_logits)
 
         # Convolutional transpose
         recon = F.conv_transpose2d(priors * impulse, self.feats)
